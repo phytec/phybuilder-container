@@ -26,7 +26,9 @@ Run the local container
 Push local container to a registry
 ==================================
 | pass=$(cat ~/sync/env/password_dockerhub_phybuilder);podman push --creds phybuilder:${pass} localhost/yocto-ubuntu-16.04:phy1 docker.io/phybuilder/yocto-ubuntu-16.04:phy1;unset pass
+| 
 | pass=$(cat ~/sync/env/password_dockerhub_phybuilder);podman push --creds phybuilder:${pass} localhost/yocto-ubuntu-18.04:phy1 docker.io/phybuilder/yocto-ubuntu-18.04:phy1;unset pass
+| 
 | pass=$(cat ~/sync/env/password_dockerhub_phybuilder);podman push --creds phybuilder:${pass} localhost/yocto-ubuntu-20.04:phy1 docker.io/phybuilder/yocto-ubuntu-20.04:phy1;unset pass
 | 
 | pass=$(cat ~/sync/env/password_dockerhub_phybuilder);podman push --creds phybuilder:${pass} localhost/yocto-ubuntu-22.04:phy1 docker.io/phybuilder/yocto-ubuntu-22.04:phy1;unset pass
