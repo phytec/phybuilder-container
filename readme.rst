@@ -15,7 +15,7 @@ You can also use the provided container files to build them locally:
 | podman build -t yocto-ubuntu-18.04:phy1 yocto-ubuntu-18.04/
 | podman build -t yocto-ubuntu-20.04:phy1 yocto-ubuntu-20.04/
 | podman build -t yocto-ubuntu-22.04:phy1 yocto-ubuntu-22.04/
-| podman build -t action-runner-ubuntu-22.04:phy1 action-runner-ubuntu-22.04/
+| podman build -t action-runner-ubuntu-22.04:phy2 action-runner-ubuntu-22.04/
 
 Run the local container
 =======================
@@ -33,4 +33,4 @@ Push local container to a registry
 | pass=$(cat ~/sync/env/password_dockerhub_phybuilder);podman push --creds phybuilder:${pass} localhost/yocto-ubuntu-20.04:phy1 docker.io/phybuilder/yocto-ubuntu-20.04:phy1;unset pass
 | 
 | pass=$(cat ~/sync/env/password_dockerhub_phybuilder);podman push --creds phybuilder:${pass} localhost/yocto-ubuntu-22.04:phy1 docker.io/phybuilder/yocto-ubuntu-22.04:phy1;unset pass
-| pass=$(cat ~/sync/env/password_dockerhub_phybuilder);podman push --creds phybuilder:${pass} localhost/action-runner-ubuntu-22.04:phy1 docker.io/phybuilder/action-runner-ubuntu-22.04:phy1;unset pass
+| pass=$(cat ~/sync/env/password_dockerhub_phybuilder);podman push --creds phybuilder:${pass} localhost/action-runner-ubuntu-22.04:phy2 docker.io/phybuilder/action-runner-ubuntu-22.04:phy2;unset pass

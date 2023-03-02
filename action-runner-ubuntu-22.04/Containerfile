@@ -22,22 +22,49 @@ RUN apt-get update -y \
     && apt-get update -y \
     && apt-get install -y --no-install-recommends \
     apt-transport-https \
+    autoconf \
+    automake \
+    binutils \
+    bison \
+    build-essential \
+    bzip2 \
     ca-certificates  \
+    coreutils \
     curl \
+    dnsutils \
+    fakeroot \
+    file \
+    ftp \
+    gcc \
     git \
     gnupg2 \
+    iproute2 \
+    iputils-ping \
     jq \
+    libc++-dev \
+    libtool \
+    libyaml-dev \
     lz4 \
+    net-tools \
+    netcat \
     openssh-client \
+    pkg-config \
     python3 \
     python3-pip \
     python3-distutils \
+    rsync \
+    sshpass \
+    subversion \
     sudo \
     tar \
+    telnet \
+    time \
     unzip \
     wget \
+    xz-utils \
     zip \
     zstd \
+    zsync \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
