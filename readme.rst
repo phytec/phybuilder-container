@@ -34,3 +34,21 @@ Push local container to a registry
 | 
 | pass=$(cat ~/sync/env/password_dockerhub_phybuilder);podman push --creds phybuilder:${pass} localhost/yocto-ubuntu-22.04:phy2 docker.io/phybuilder/yocto-ubuntu-22.04:phy2;unset pass
 | pass=$(cat ~/sync/env/password_dockerhub_phybuilder);podman push --creds phybuilder:${pass} localhost/action-runner-ubuntu-22.04:phy2 docker.io/phybuilder/action-runner-ubuntu-22.04:phy2;unset pass
+
+
+Known issues
+============
+
+1. When using rootless podman on some host distros or kernel versions, you might get the following error:
+
+.. code-block::
+        ERROR: Task (...) failed with exit code '1'
+        Pseudo log:
+        path mismatch [1 link]: ino 33756398 db '/tmp/sh-thd.OrwpmG' req '/tmp/sh-thd.gJsVnF'.
+        Setup complete, sending SIGUSR1 to pid 449.
+
+The issue has been discussed here:
+https://groups.google.com/g/kas-devel/c/Dm3OcBS-yao
+
+The workaround is to add the following cmdline option to podman: "--tmpfs /tmp"
+
