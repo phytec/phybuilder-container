@@ -32,6 +32,7 @@ RUN \
 	python3-jinja2 \
 	python3-pexpect \
 	python3-pip \
+	rsync \
 	socat \
 	sudo \
 	texinfo \
