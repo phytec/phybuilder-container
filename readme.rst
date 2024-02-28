@@ -6,6 +6,26 @@ This repository contains the build containers we use in our infrastructure to bu
 They get pushed to docker.io, so you can use them directly on your development machine or in a ci loop:
 https://hub.docker.com/u/phybuilder
 
+Overview
+========
+
+We provide different container for different software projects. This is a quick
+overview of the use-cases of the different images:
+
++---------------------+----------------------------------------------+
+| Containers          |  use cases / content                         |
++=====================+==============================================+
+|| yocto-debian-*     | | build our Yocto BSP manually or in CI      |
+|| yocto-ubuntu-*     | | should cover all host dependencies         |
++---------------------+----------------------------------------------+
+| action-runner-*     | | run github actions from different projects |
+|                     | | in self hosted runners                     |
++---------------------+----------------------------------------------+
+| python-ubuntu-*     | | image containing serveral python versions  |
+|                     | | It is used to build different python       |
+|                     | | based projects                             |
++---------------------+----------------------------------------------+
+
 Run the prebuild container
 ==========================
 If you have not pulled any of our container right now, you can run:
