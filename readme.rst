@@ -20,6 +20,12 @@ overview of the use-cases of the different images:
 ||                    | | * bitbake build and shell                       |
 ||                    | | * cover all host dependencies                   |
 +---------------------+---------------------------------------------------+
+|| zephyr-ubuntu-*    | | build a Zephyr RTOS board. This image includes  |
+||                    | | all required host dependencies                  |
++---------------------+---------------------------------------------------+
+|| zephyr-*-ubuntu-*  | | like zephyr-ubunut-* but also includes the      |
+||                    | | official Zephyr SDK                             |
++---------------------+---------------------------------------------------+
 | action-runner-*     | | run github actions from different projects      |
 |                     | | in self hosted runners                          |
 +---------------------+---------------------------------------------------+
@@ -61,6 +67,8 @@ You can also use the provided container files to build them locally:
 | podman build -t yocto-ubuntu-20.04:phy2 yocto-ubuntu-20.04/
 | podman build -t yocto-ubuntu-22.04:phy2 yocto-ubuntu-22.04/
 | podman build -t yocto-debian-12:phy1 yocto-debian-12/
+| podman build -t zephyr-ubuntu-22.04:phy1 zephyr-ubuntu-22.04/
+| podman build -t zephyr-0.16.y-ubuntu-22.04:phy1 zephyr-0.16.y-ubuntu-22.04/
 | podman build -t action-runner-ubuntu-22.04:phy2 action-runner-ubuntu-22.04/
 
 Run the local / already pulled container
@@ -70,6 +78,8 @@ Run the local / already pulled container
 | podman run --rm=true -v /home:/home --userns=keep-id --workdir=$PWD -it yocto-ubuntu-20.04:phy2 bash
 | podman run --rm=true -v /home:/home --userns=keep-id --workdir=$PWD -it yocto-ubuntu-22.04:phy2 bash
 | podman run --rm=true -v /home:/home --userns=keep-id --workdir=$PWD -it yocto-debian-12:phy1 bash
+| podman run --rm=true -v /home:/home --userns=keep-id --workdir=$PWD -it zephyr-ubuntu-22.04:phy1 bash
+| podman run --rm=true -v /home:/home --userns=keep-id --workdir=$PWD -it zephyr-0.16.y-ubuntu-22.04:phy1 bash
 
 Push local container to a registry
 ==================================
