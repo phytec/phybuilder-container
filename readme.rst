@@ -12,19 +12,21 @@ Overview
 We provide different container for different software projects. This is a quick
 overview of the use-cases of the different images:
 
-+---------------------+----------------------------------------------+
-| Containers          |  use cases / content                         |
-+=====================+==============================================+
-|| yocto-debian-*     | | build our Yocto BSP manually or in CI      |
-|| yocto-ubuntu-*     | | should cover all host dependencies         |
-+---------------------+----------------------------------------------+
-| action-runner-*     | | run github actions from different projects |
-|                     | | in self hosted runners                     |
-+---------------------+----------------------------------------------+
-| python-ubuntu-*     | | image containing serveral python versions  |
-|                     | | It is used to build different python       |
-|                     | | based projects                             |
-+---------------------+----------------------------------------------+
++---------------------+---------------------------------------------------+
+| Containers          |  use cases / content                              |
++=====================+===================================================+
+|| yocto-debian-*     | | build our Yocto BSP manually or in CI           |
+|| yocto-ubuntu-*     | | * run phyLinux                                  |
+||                    | | * bitbake build and shell                       |
+||                    | | * cover all host dependencies                   |
++---------------------+---------------------------------------------------+
+| action-runner-*     | | run github actions from different projects      |
+|                     | | in self hosted runners                          |
++---------------------+---------------------------------------------------+
+| python-ubuntu-*     | | image containing serveral python versions       |
+|                     | | It is used to build different python            |
+|                     | | based projects                                  |
++---------------------+---------------------------------------------------+
 
 Run the prebuild container
 ==========================
