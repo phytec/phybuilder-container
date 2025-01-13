@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# Exit on error
+set -e
+
+# Check if Containerfile path is provided
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 path/to/Containerfile"
+    exit 1
+fi
+
+CONTAINERFILE="$1"
+REGISTRY="docker.io"
+NAMESPACE="phybuilder"
+PASSWORD=$(cat ~/sync/env/password_dockerhub_phybuilder)
+
+# Extract image name from path (remove Containerfile and convert / to -)
+IMAGE_NAME=$(dirname "$CONTAINERFILE" | tr '/' '-' | sed 's/^-//')
+
+# Function to get next phy tag number
+get_next_phy_tag() {
+    local max_tag=0
+    
+    # Get all tags into an array
+    local tags=($(skopeo list-tags "docker://$REGISTRY/$NAMESPACE/$IMAGE_NAME" 2>/dev/null | grep -o 'phy[0-9]\+' | sed 's/phy//'))
+    
+    # Find highest tag number
+    for num in "${tags[@]}"; do
+        if [ "$num" -gt "$max_tag" ]; then
+            max_tag=$num
+        fi
+    done
+    
+    echo $((max_tag + 1))
+}
+
+# Get next tag number
+TAG_NUM=$(get_next_phy_tag)
+TAG="phy$TAG_NUM"
+
+echo "Building image: $IMAGE_NAME:$TAG"
+
+# Build the image using podman
+podman build -t "$IMAGE_NAME:$TAG" -f "$CONTAINERFILE" $(dirname "$CONTAINERFILE")
+
+# Tag for registry
+FULL_IMAGE="$REGISTRY/$NAMESPACE/$IMAGE_NAME"
+podman tag "$IMAGE_NAME:$TAG" "$FULL_IMAGE:$TAG"
+
+# Check if tag already exists
+if skopeo inspect --creds "$NAMESPACE":"$PASSWORD" "docker://$FULL_IMAGE:$TAG" >/dev/null 2>&1; then
+    echo "Error: Tag $TAG already exists for $FULL_IMAGE"
+    exit 1
+fi
+
+# Push the new tag to registry
+echo "Pushing $FULL_IMAGE:$TAG"
+podman push --creds "$NAMESPACE":"$PASSWORD" "$FULL_IMAGE:$TAG"
+
+
+echo "Updating latest tag to point to $TAG"
+
+# Tag locally
+podman tag "$IMAGE_NAME:$TAG" "$FULL_IMAGE:latest"
+    
+# Push latest tag
+podman push --creds "$NAMESPACE":"$PASSWORD" "$FULL_IMAGE:latest"
+
+# Create git tag
+echo "Creating git tag: ${IMAGE_NAME}_${TAG}"
+git tag "${IMAGE_NAME}_${TAG}"
+git push origin "${IMAGE_NAME}_${TAG}"
