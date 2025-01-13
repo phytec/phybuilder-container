@@ -83,17 +83,9 @@ Run the local / already pulled container
 
 Push local container to a registry
 ==================================
-| pass=$(cat ~/sync/env/password_dockerhub_phybuilder);podman push --creds phybuilder:${pass} localhost/yocto-ubuntu-16.04:phy1 docker.io/phybuilder/yocto-ubuntu-16.04:phy1;unset pass
-| 
-| pass=$(cat ~/sync/env/password_dockerhub_phybuilder);podman push --creds phybuilder:${pass} localhost/yocto-ubuntu-18.04:phy1 docker.io/phybuilder/yocto-ubuntu-18.04:phy1;unset pass
-| 
-| pass=$(cat ~/sync/env/password_dockerhub_phybuilder);podman push --creds phybuilder:${pass} localhost/yocto-ubuntu-20.04:phy2 docker.io/phybuilder/yocto-ubuntu-20.04:phy2;unset pass
-| 
-| pass=$(cat ~/sync/env/password_dockerhub_phybuilder);podman push --creds phybuilder:${pass} localhost/yocto-ubuntu-22.04:phy2 docker.io/phybuilder/yocto-ubuntu-22.04:phy2;unset pass
-| 
-| pass=$(cat ~/sync/env/password_dockerhub_phybuilder);podman push --creds phybuilder:${pass} localhost/yocto-debian-12:phy1 docker.io/phybuilder/yocto-debian-12:phy1;unset pass
-|
-| pass=$(cat ~/sync/env/password_dockerhub_phybuilder);podman push --creds phybuilder:${pass} localhost/action-runner-ubuntu-22.04:phy2 docker.io/phybuilder/action-runner-ubuntu-22.04:phy2;unset pass
+When a container image changed content and we want to update the build image on the registry, just use the release script. It will check what is the newest tag and also update the "latest" tag.
+
+| scripts/release yocto-ubuntu-22.04/Containerfile
 
 
 Known issues
