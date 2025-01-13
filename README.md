@@ -33,6 +33,11 @@ podman run --rm=true -v /home:/home --userns=keep-id --workdir=$PWD -it docker.i
 
 ### Releases
 
+Releases get pushed to docker hub.
+
+<https://hub.docker.com/u/phybuilder>
+
+
 Deployed containers get tagged with phy1, phy2, ... release tags, e.g.:
 
 ```bash
