@@ -19,6 +19,7 @@ RUN \
 	git-core \
 	gnupg \
 	iputils-ping \
+	less \
 	libegl1-mesa-dev \
 	libgmp-dev \
 	libmpc-dev \
