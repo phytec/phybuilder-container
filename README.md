@@ -24,11 +24,11 @@ If you have not pulled any of our container right now, you can run:
 ### Latest available containers:
 
 ```bash
-podman run --rm=true -v /home:/home --userns=keep-id --workdir=$PWD -it docker.io/phybuilder/yocto-ubuntu-16.04 bash
-podman run --rm=true -v /home:/home --userns=keep-id --workdir=$PWD -it docker.io/phybuilder/yocto-ubuntu-18.04 bash
-podman run --rm=true -v /home:/home --userns=keep-id --workdir=$PWD -it docker.io/phybuilder/yocto-ubuntu-20.04 bash
-podman run --rm=true -v /home:/home --userns=keep-id --workdir=$PWD -it docker.io/phybuilder/yocto-ubuntu-22.04 bash
-podman run --rm=true -v /home:/home --userns=keep-id --workdir=$PWD -it docker.io/phybuilder/yocto-debian-12 bash
+podman run --rm=true -v /home:/home --userns=keep-id --workdir="${PWD}" -it docker.io/phybuilder/yocto-ubuntu-16.04 bash
+podman run --rm=true -v /home:/home --userns=keep-id --workdir="${PWD}" -it docker.io/phybuilder/yocto-ubuntu-18.04 bash
+podman run --rm=true -v /home:/home --userns=keep-id --workdir="${PWD}" -it docker.io/phybuilder/yocto-ubuntu-20.04 bash
+podman run --rm=true -v /home:/home --userns=keep-id --workdir="${PWD}" -it docker.io/phybuilder/yocto-ubuntu-22.04 bash
+podman run --rm=true -v /home:/home --userns=keep-id --workdir="${PWD}" -it docker.io/phybuilder/yocto-debian-12 bash
 ```
 
 ### Releases
@@ -41,13 +41,13 @@ Releases get pushed to docker hub.
 Deployed containers get tagged with phy1, phy2, ... release tags, e.g.:
 
 ```bash
-podman run --rm=true -v /home:/home --userns=keep-id --workdir=$PWD -it docker.io/phybuilder/yocto-ubuntu-22.04:phy2 bash
+podman run --rm=true -v /home:/home --userns=keep-id --workdir="${PWD}" -it docker.io/phybuilder/yocto-ubuntu-22.04:phy2 bash
 ```
 
 If you want to run a container with docker, only remove "--userns=keep-id":
 
 ```bash
-docker run --rm=true -v /home:/home --workdir=$PWD -it docker.io/phybuilder/yocto-ubuntu-22.04 bash
+docker run --rm=true -v /home:/home --workdir="${PWD}" -it docker.io/phybuilder/yocto-ubuntu-22.04 bash
 ```
 
 ## Build the container locally
@@ -61,10 +61,10 @@ podman build -t yocto-ubuntu-22.04:local_build_1 yocto-ubuntu-22.04/
 ## Run the local / already pulled container
 
 ```bash
-podman run --rm=true -v /home:/home --userns=keep-id --workdir=$PWD -it yocto-ubuntu-20.04 bash
-podman run --rm=true -v /home:/home --userns=keep-id --workdir=$PWD -it yocto-ubuntu-22.04:phy2 bash
-podman run --rm=true -v /home:/home --userns=keep-id --workdir=$PWD -it zephyr-ubuntu-22.04:phy1 bash
-podman run --rm=true -v /home:/home --userns=keep-id --workdir=$PWD -it zephyr-0.16.y-ubuntu-22.04:phy1 bash
+podman run --rm=true -v /home:/home --userns=keep-id --workdir="${PWD}" -it yocto-ubuntu-20.04 bash
+podman run --rm=true -v /home:/home --userns=keep-id --workdir="${PWD}" -it yocto-ubuntu-22.04:phy2 bash
+podman run --rm=true -v /home:/home --userns=keep-id --workdir="${PWD}" -it zephyr-ubuntu-22.04:phy1 bash
+podman run --rm=true -v /home:/home --userns=keep-id --workdir="${PWD}" -it zephyr-0.16.y-ubuntu-22.04:phy1 bash
 ```
 
 ## Push release build container to a registry
