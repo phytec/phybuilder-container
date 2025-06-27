@@ -64,7 +64,7 @@ podman build -t yocto-ubuntu-22.04:local_build_1 yocto-ubuntu-22.04/
 podman run --rm=true -v /home:/home --userns=keep-id --workdir="${PWD}" -it yocto-ubuntu-20.04 bash
 podman run --rm=true -v /home:/home --userns=keep-id --workdir="${PWD}" -it yocto-ubuntu-22.04:phy2 bash
 podman run --rm=true -v /home:/home --userns=keep-id --workdir="${PWD}" -it zephyr-ubuntu-22.04:phy1 bash
-podman run --rm=true -v /home:/home --userns=keep-id --workdir="${PWD}" -it zephyr-0.16.y-ubuntu-22.04:phy1 bash
+podman run --rm=true -v /home:/home --userns=keep-id --workdir="${PWD}" -it zephyr-0.17.y-ubuntu-22.04:phy1 bash
 ```
 
 ## Push release build container to a registry
