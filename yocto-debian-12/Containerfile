@@ -2,9 +2,9 @@
 FROM debian:bookworm-20230814
 
 RUN \
-    apt-get clean && \
-    apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends \
+	apt-get clean && \
+	apt-get update && \
+	DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends \
 	build-essential \
 	chrpath \
 	cpio \
@@ -35,14 +35,14 @@ RUN \
 	wget \
 	xz-utils \
 	zstd \
-    && rm -rf /var/lib/apt/lists/* && \
-    echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen && \
-    locale-gen
+	&& rm -rf /var/lib/apt/lists/* && \
+	echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen && \
+	locale-gen
 
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 
 RUN \
-    wget -O /usr/local/bin/phyLinux https://download.phytec.de/Software/Linux/Yocto/Tools/phyLinux && \
-    chmod a+x /usr/local/bin/phyLinux && \
-    wget -O /usr/local/bin/repo https://storage.googleapis.com/git-repo-downloads/repo && \
-    chmod a+x /usr/local/bin/repo
+	wget -O /usr/local/bin/phyLinux https://download.phytec.de/Software/Linux/Yocto/Tools/phyLinux && \
+	chmod a+x /usr/local/bin/phyLinux && \
+	wget -O /usr/local/bin/repo https://storage.googleapis.com/git-repo-downloads/repo && \
+	chmod a+x /usr/local/bin/repo
