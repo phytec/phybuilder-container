@@ -1,43 +1,43 @@
 FROM ubuntu:18.04
 
 RUN \
-    apt-get update && \
-    apt-get install -y -q --no-install-recommends \
-        -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" \
-        build-essential \
-        chrpath \
-        cpio \
-        diffstat \
-        file \
-        g++-multilib \
-        gawk \
-        gcc-multilib \
-        git-core \
-        locales \
-        openssh-client \
-        python \
-        python3 \
-        python3-distutils \
-	rsync \
-        socat \
-        sudo \
-        texinfo \
-        tmux \
-        unzip \
-        vim \
-        wget \
-    && rm -rf /var/lib/apt/lists/* && \
-    locale-gen en_US.UTF-8
+	apt-get update && \
+	apt-get install -y -q --no-install-recommends \
+		-o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" \
+		build-essential \
+		chrpath \
+		cpio \
+		diffstat \
+		file \
+		g++-multilib \
+		gawk \
+		gcc-multilib \
+		git-core \
+		locales \
+		openssh-client \
+		python \
+		python3 \
+		python3-distutils \
+		rsync \
+		socat \
+		sudo \
+		texinfo \
+		tmux \
+		unzip \
+		vim \
+		wget \
+	&& rm -rf /var/lib/apt/lists/* && \
+	locale-gen en_US.UTF-8
 
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 
 RUN \
-    apt-get update && \
-    apt-get install -y -q --no-install-recommends \
-        -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" \
-        ca-certificates \
-    && rm -rf /var/lib/apt/lists/* && \
-    wget -O /usr/local/bin/phyLinux https://download.phytec.de/Software/Linux/Yocto/Tools/phyLinux && \
-    chmod a+x /usr/local/bin/phyLinux && \
-    wget -O /usr/local/bin/repo https://storage.googleapis.com/git-repo-downloads/repo && \
-    chmod a+x /usr/local/bin/repo
+	apt-get update && \
+	apt-get install -y -q --no-install-recommends \
+		-o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" \
+		ca-certificates \
+	&& rm -rf /var/lib/apt/lists/* && \
+	wget -O /usr/local/bin/phyLinux https://download.phytec.de/Software/Linux/Yocto/Tools/phyLinux && \
+	chmod a+x /usr/local/bin/phyLinux && \
+	wget -O /usr/local/bin/repo https://storage.googleapis.com/git-repo-downloads/repo && \
+	chmod a+x /usr/local/bin/repo
