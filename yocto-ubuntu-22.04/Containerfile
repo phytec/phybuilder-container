@@ -29,6 +29,7 @@ RUN \
 	locales \
 	lz4 \
 	openssh-client \
+	pipx \
 	pylint \
 	python2 \
 	python3 \
@@ -62,3 +63,5 @@ RUN \
     chmod a+x /usr/local/bin/phyLinux && \
     wget -O /usr/local/bin/repo https://storage.googleapis.com/git-repo-downloads/repo && \
     chmod a+x /usr/local/bin/repo
+
+RUN PIPX_BIN_DIR=/usr/local/bin pipx install kas==5.0
