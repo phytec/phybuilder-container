@@ -14,7 +14,6 @@ RUN \
 	gawk \
 	gcc-multilib \
 	git-core \
-	kas \
 	less \
 	libncurses-dev \
 	locales \
