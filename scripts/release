@@ -9,6 +9,12 @@ if [ $# -ne 1 ]; then
     exit 1
 fi
 
+# skopeo is required for safe tag number calculation; abort early if missing
+if ! command -v skopeo &>/dev/null; then
+    echo "Error: skopeo is not installed. Install it before running this script."
+    exit 1
+fi
+
 CONTAINERFILE="$1"
 REGISTRY="docker.io"
 NAMESPACE="phybuilder"
@@ -20,17 +26,21 @@ IMAGE_NAME=$(dirname "$CONTAINERFILE" | tr '/' '-' | sed 's/^-//')
 # Function to get next phy tag number
 get_next_phy_tag() {
     local max_tag=0
-    
-    # Get all tags into an array
-    local tags=($(skopeo list-tags "docker://$REGISTRY/$NAMESPACE/$IMAGE_NAME" 2>/dev/null | grep -o 'phy[0-9]\+' | sed 's/phy//'))
-    
-    # Find highest tag number
+
+    # Do NOT suppress errors: if skopeo cannot reach the registry the script
+    # must abort rather than silently computing phy1 and overwriting it.
+    local tags_json
+    tags_json=$(skopeo list-tags "docker://$REGISTRY/$NAMESPACE/$IMAGE_NAME")
+
+    local tags=()
+    mapfile -t tags < <(echo "$tags_json" | grep -o 'phy[0-9]\+' | sed 's/phy//')
+
     for num in "${tags[@]}"; do
         if [ "$num" -gt "$max_tag" ]; then
             max_tag=$num
         fi
     done
-    
+
     echo $((max_tag + 1))
 }
 
@@ -47,7 +57,10 @@ podman build -t "$IMAGE_NAME:$TAG" -f "$CONTAINERFILE" $(dirname "$CONTAINERFILE
 FULL_IMAGE="$REGISTRY/$NAMESPACE/$IMAGE_NAME"
 podman tag "$IMAGE_NAME:$TAG" "$FULL_IMAGE:$TAG"
 
-# Check if tag already exists
+# Check if tag already exists — skopeo inspect: exit 0 means tag found (error),
+# non-zero means not found (proceed). An unreachable registry is non-zero too,
+# but since get_next_phy_tag already required a successful list-tags above, a
+# failure here indicates a race and should stop the script.
 if skopeo inspect --creds "$NAMESPACE":"$PASSWORD" "docker://$FULL_IMAGE:$TAG" >/dev/null 2>&1; then
     echo "Error: Tag $TAG already exists for $FULL_IMAGE"
     exit 1
@@ -56,7 +69,6 @@ fi
 # Push the new tag to registry
 echo "Pushing $FULL_IMAGE:$TAG"
 podman push --creds "$NAMESPACE":"$PASSWORD" "$FULL_IMAGE:$TAG"
-
 
 echo "Updating latest tag to point to $TAG"
 
