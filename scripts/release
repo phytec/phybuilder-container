@@ -23,6 +23,12 @@ PASSWORD=$(cat ~/sync/env/password_dockerhub_phybuilder)
 # Extract image name from path (remove Containerfile and convert / to -)
 IMAGE_NAME=$(dirname "$CONTAINERFILE" | tr '/' '-' | sed 's/^-//')
 
+# Sync release tags from upstream before computing the next tag number.
+# Without this, another machine's releases are invisible locally and the same
+# phy tag can be reused, overwriting the registry image.
+echo "Syncing release tags from origin..."
+git fetch origin --tags
+
 # Function to get next phy tag number
 get_next_phy_tag() {
     local max_tag=0
@@ -35,7 +41,11 @@ get_next_phy_tag() {
     local tags=()
     mapfile -t tags < <(echo "$tags_json" | grep -o 'phy[0-9]\+' | sed 's/phy//')
 
-    for num in "${tags[@]}"; do
+    # Also consider git release tags; these may be ahead of what list-tags returns.
+    local git_tags=()
+    mapfile -t git_tags < <(git tag -l "${IMAGE_NAME}_phy[0-9]*" | sed 's/.*_phy//')
+
+    for num in "${tags[@]}" "${git_tags[@]}"; do
         if [ "$num" -gt "$max_tag" ]; then
             max_tag=$num
         fi
@@ -79,6 +89,12 @@ podman tag "$IMAGE_NAME:$TAG" "$FULL_IMAGE:latest"
 podman push --creds "$NAMESPACE":"$PASSWORD" "$FULL_IMAGE:latest"
 
 # Create git tag
-echo "Creating git tag: ${IMAGE_NAME}_${TAG}"
-git tag "${IMAGE_NAME}_${TAG}"
-git push origin "${IMAGE_NAME}_${TAG}"
+GIT_TAG="${IMAGE_NAME}_${TAG}"
+if git rev-parse "$GIT_TAG" >/dev/null 2>&1; then
+    echo "Error: Git tag $GIT_TAG already exists"
+    exit 1
+fi
+
+echo "Creating git tag: $GIT_TAG"
+git tag "$GIT_TAG"
+git push origin "$GIT_TAG"
