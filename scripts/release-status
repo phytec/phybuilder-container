@@ -1,0 +1,104 @@
+#!/bin/bash
+
+# Report upstream sync state and which container folders need a new release.
+set -euo pipefail
+
+# git log uses a pager on a TTY; disable it so the script prints and exits.
+export GIT_PAGER=cat
+
+REMOTE="${REMOTE:-origin}"
+UPSTREAM="${UPSTREAM:-${REMOTE}/main}"
+
+cd "$(git rev-parse --show-toplevel)"
+
+image_name_from_containerfile() {
+    dirname "$1" | tr '/' '-' | sed 's/^-//'
+}
+
+latest_phy_tag() {
+    local image_name="$1"
+    git tag -l "*${image_name}_phy[0-9]*" | sort -V | tail -1
+}
+
+echo "Fetching from $REMOTE..."
+git fetch "$REMOTE" --tags
+
+status=0
+
+echo
+echo "=== Upstream sync ==="
+
+if ! git rev-parse --verify "$UPSTREAM" >/dev/null 2>&1; then
+    echo "Error: upstream ref $UPSTREAM not found"
+    exit 1
+fi
+
+behind=$(git rev-list --count HEAD.."$UPSTREAM")
+ahead=$(git rev-list --count "$UPSTREAM"..HEAD)
+
+if [ "$behind" -gt 0 ]; then
+    echo "Behind $UPSTREAM by $behind commit(s) — pull or rebase before releasing"
+    git log --oneline HEAD.."$UPSTREAM"
+    status=1
+fi
+
+if [ "$ahead" -gt 0 ]; then
+    echo "Ahead of $UPSTREAM by $ahead unpushed commit(s)"
+    git log --oneline "$UPSTREAM"..HEAD
+    status=1
+fi
+
+if [ "$behind" -eq 0 ] && [ "$ahead" -eq 0 ]; then
+    echo "Branch HEAD matches $UPSTREAM"
+fi
+
+if ! git diff-index --quiet HEAD --; then
+    echo "Working tree has uncommitted changes"
+    status=1
+fi
+
+echo
+echo "=== Release status (since last phy tag on HEAD) ==="
+
+needs_release=0
+
+for containerfile in */Containerfile; do
+    [ -f "$containerfile" ] || continue
+
+    folder=$(dirname "$containerfile")
+    image_name=$(image_name_from_containerfile "$containerfile")
+    last_tag=$(latest_phy_tag "$image_name")
+
+    if [ -z "$last_tag" ]; then
+        if git rev-list -1 HEAD -- "$folder/" >/dev/null 2>&1; then
+            echo "$folder: needs release (never released)"
+            git log --oneline -5 -- "$folder/"
+            needs_release=1
+        fi
+        continue
+    fi
+
+    phy_num=${last_tag##*_phy}
+    commits=$(git log --oneline "${last_tag}..HEAD" -- "$folder/")
+
+    if [ -n "$commits" ]; then
+        echo "$folder: needs release (last: phy${phy_num})"
+        echo "$commits" | sed 's/^/  /'
+        needs_release=1
+    else
+        echo "$folder: up to date (phy${phy_num})"
+    fi
+done
+
+if [ "$needs_release" -eq 1 ]; then
+    status=1
+fi
+
+echo
+if [ "$status" -eq 0 ]; then
+    echo "Ready to release: in sync with upstream and no pending container changes."
+else
+    echo "Not ready to release: resolve the items above first."
+fi
+
+exit "$status"
