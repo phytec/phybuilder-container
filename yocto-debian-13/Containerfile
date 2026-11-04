@@ -9,6 +9,7 @@ RUN \
 	build-essential \
 	chrpath \
 	cpio \
+	curl \
 	diffstat \
 	file \
 	g++-multilib \
@@ -19,6 +20,7 @@ RUN \
 	libncurses-dev \
 	locales \
 	lz4 \
+	nodejs \
 	procps \
 	openssh-client \
 	pipx \

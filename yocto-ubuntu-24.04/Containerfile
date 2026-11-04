@@ -12,6 +12,7 @@ RUN \
 	ca-certificates \
 	chrpath \
 	cpio \
+	curl \
 	diffstat \
 	file \
 	flex \
@@ -30,6 +31,7 @@ RUN \
 	libssl-dev \
 	locales \
 	lz4 \
+	nodejs \
 	openssh-client \
 	pipx \
 	pylint \
