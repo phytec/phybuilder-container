@@ -2,55 +2,55 @@
 FROM debian:trixie-20250929
 
 RUN \
-    apt-get clean && \
-    apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends \
-	bash-completion \
-	build-essential \
-	chrpath \
-	cpio \
-	curl \
-	diffstat \
-	file \
-	g++-multilib \
-	gawk \
-	gcc-multilib \
-	git-core \
-	less \
-	libncurses-dev \
-	locales \
-	lz4 \
-	nodejs \
-	procps \
-	openssh-client \
-	pipx \
-	podman \
-	python3 \
-	python3-setuptools \
-	python3-pip \
-	python3-venv \
-	python-is-python3 \
-	rsync \
-	socat \
-	sudo \
-	sysstat \
-	texinfo \
-	tmux \
-	unzip \
-	vim \
-	wget \
-	xz-utils \
-	zstd \
-    && rm -rf /var/lib/apt/lists/* && \
-    echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen && \
-    locale-gen
+	apt-get clean && \
+	apt-get update && \
+	DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends \
+		bash-completion \
+		build-essential \
+		chrpath \
+		cpio \
+		curl \
+		diffstat \
+		file \
+		g++-multilib \
+		gawk \
+		gcc-multilib \
+		git-core \
+		less \
+		libncurses-dev \
+		locales \
+		lz4 \
+		nodejs \
+		procps \
+		openssh-client \
+		pipx \
+		podman \
+		python3 \
+		python3-setuptools \
+		python3-pip \
+		python3-venv \
+		python-is-python3 \
+		rsync \
+		socat \
+		sudo \
+		sysstat \
+		texinfo \
+		tmux \
+		unzip \
+		vim \
+		wget \
+		xz-utils \
+		zstd \
+	&& rm -rf /var/lib/apt/lists/* && \
+	echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen && \
+	locale-gen
 
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 
 RUN \
-    wget -O /usr/local/bin/phyLinux https://download.phytec.de/Software/Linux/Yocto/Tools/phyLinux && \
-    chmod a+x /usr/local/bin/phyLinux && \
-    wget -O /usr/local/bin/repo https://storage.googleapis.com/git-repo-downloads/repo && \
-    chmod a+x /usr/local/bin/repo
+	wget -O /usr/local/bin/phyLinux https://download.phytec.de/Software/Linux/Yocto/Tools/phyLinux && \
+	chmod a+x /usr/local/bin/phyLinux && \
+	wget -O /usr/local/bin/repo https://storage.googleapis.com/git-repo-downloads/repo && \
+	chmod a+x /usr/local/bin/repo
 
 RUN pipx install --global kas==5.5
