@@ -58,6 +58,15 @@ You can also use the provided container files to build them locally:
 podman build -t yocto-ubuntu-22.04:local_build_1 yocto-ubuntu-22.04/
 ```
 
+### apt cleanup in Containerfiles
+
+Images based on a distro with apt >= 2.7 (Ubuntu 24.04 and newer, Debian 13
+and newer) clean up with `apt-get distclean`. It removes the package lists but
+keeps the `Release`/`InRelease` files, so a later `apt-get update` inside the
+container can detect downgraded or no longer signed repository metadata. Older
+apt versions lack `distclean`, so those images use
+`rm -rf /var/lib/apt/lists/*` instead.
+
 ## Run the local / already pulled container
 
 ```bash
