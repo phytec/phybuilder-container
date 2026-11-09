@@ -17,7 +17,7 @@ image_name_from_containerfile() {
 
 latest_phy_tag() {
     local image_name="$1"
-    git tag -l "*${image_name}_phy[0-9]*" | sort -V | tail -1
+    git tag -l "${image_name}_phy[0-9]*" | sort -V | tail -1
 }
 
 echo "Fetching from $REMOTE..."

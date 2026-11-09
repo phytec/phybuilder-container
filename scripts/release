@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Exit on error
-set -e
+# Exit on error, unset variables and failures inside pipelines
+set -euo pipefail
 
 # Check if Containerfile path is provided
 if [ $# -ne 1 ]; then
@@ -18,28 +18,67 @@ fi
 CONTAINERFILE="$1"
 REGISTRY="docker.io"
 NAMESPACE="phybuilder"
+REMOTE="origin"
+UPSTREAM="$REMOTE/main"
+
+if [ ! -f "$CONTAINERFILE" ]; then
+    echo "Error: $CONTAINERFILE does not exist"
+    exit 1
+fi
+
+CONTEXT_DIR=$(dirname "$CONTAINERFILE")
+
+# Image name is the name of the folder holding the Containerfile. Resolve it so
+# that "./foo/Containerfile", "foo/Containerfile" and absolute paths all agree.
+IMAGE_NAME=$(basename "$(realpath "$CONTEXT_DIR")")
+FULL_IMAGE="$REGISTRY/$NAMESPACE/$IMAGE_NAME"
+
 PASSWORD=$(cat ~/sync/env/password_dockerhub_phybuilder)
 
-# Extract image name from path (remove Containerfile and convert / to -)
-IMAGE_NAME=$(dirname "$CONTAINERFILE" | tr '/' '-' | sed 's/^-//')
-
-# Sync release tags from upstream before computing the next tag number.
+# Sync release tags and upstream before computing the next tag number.
 # Without this, another machine's releases are invisible locally and the same
 # phy tag can be reused, overwriting the registry image.
-echo "Syncing release tags from origin..."
-git fetch origin --tags
+echo "Syncing with $REMOTE..."
+git fetch "$REMOTE" --tags
+
+# Only release what is committed and pushed: the git tag must point at a
+# commit that exists upstream and matches what gets built.
+if ! git diff-index --quiet HEAD --; then
+    echo "Error: working tree has uncommitted changes"
+    exit 1
+fi
+if [ -n "$(git ls-files --others --exclude-standard -- "$CONTEXT_DIR")" ]; then
+    echo "Error: untracked files in $CONTEXT_DIR would end up in the build context"
+    exit 1
+fi
+if [ "$(git rev-parse HEAD)" != "$(git rev-parse "$UPSTREAM")" ]; then
+    echo "Error: HEAD does not match $UPSTREAM — pull/push first (see scripts/release-status)"
+    exit 1
+fi
+
+# Print the phy tags currently on the registry, one per line. Errors are NOT
+# suppressed: if skopeo cannot reach the registry the script must abort rather
+# than treat the tag list as empty and overwrite phy1.
+registry_phy_tags() {
+    local tags_json
+    # Explicit return: set -e is inactive when called from an if-condition
+    tags_json=$(skopeo list-tags --creds "$NAMESPACE:$PASSWORD" "docker://$FULL_IMAGE") || return 1
+    echo "$tags_json" | grep -o '"phy[0-9]\+"' | tr -d '"' || true
+}
 
 # Function to get next phy tag number
 get_next_phy_tag() {
     local max_tag=0
 
-    # Do NOT suppress errors: if skopeo cannot reach the registry the script
-    # must abort rather than silently computing phy1 and overwriting it.
-    local tags_json
-    tags_json=$(skopeo list-tags "docker://$REGISTRY/$NAMESPACE/$IMAGE_NAME")
+    # Capture first: mapfile < <(...) would swallow a skopeo failure
+    local registry_tags
+    if ! registry_tags=$(registry_phy_tags); then
+        echo "Error: could not list tags of $FULL_IMAGE" >&2
+        return 1
+    fi
 
     local tags=()
-    mapfile -t tags < <(echo "$tags_json" | grep -o 'phy[0-9]\+' | sed 's/phy//')
+    mapfile -t tags < <(sed -n 's/^phy//p' <<<"$registry_tags")
 
     # Also consider git release tags; these may be ahead of what list-tags returns.
     local git_tags=()
@@ -57,21 +96,31 @@ get_next_phy_tag() {
 # Get next tag number
 TAG_NUM=$(get_next_phy_tag)
 TAG="phy$TAG_NUM"
+GIT_TAG="${IMAGE_NAME}_${TAG}"
+
+# Check the git tag before building or pushing anything, so a collision never
+# leaves the registry updated without a matching git tag.
+if git rev-parse -q --verify "refs/tags/$GIT_TAG" >/dev/null; then
+    echo "Error: Git tag $GIT_TAG already exists"
+    exit 1
+fi
 
 echo "Building image: $IMAGE_NAME:$TAG"
 
 # Build the image using podman
-podman build -t "$IMAGE_NAME:$TAG" -f "$CONTAINERFILE" $(dirname "$CONTAINERFILE")
+podman build -t "$IMAGE_NAME:$TAG" -f "$CONTAINERFILE" "$CONTEXT_DIR"
 
 # Tag for registry
-FULL_IMAGE="$REGISTRY/$NAMESPACE/$IMAGE_NAME"
 podman tag "$IMAGE_NAME:$TAG" "$FULL_IMAGE:$TAG"
 
-# Check if tag already exists — skopeo inspect: exit 0 means tag found (error),
-# non-zero means not found (proceed). An unreachable registry is non-zero too,
-# but since get_next_phy_tag already required a successful list-tags above, a
-# failure here indicates a race and should stop the script.
-if skopeo inspect --creds "$NAMESPACE":"$PASSWORD" "docker://$FULL_IMAGE:$TAG" >/dev/null 2>&1; then
+# Re-check right before pushing (the build can take a long time). Uses
+# list-tags membership instead of "skopeo inspect fails => tag is free", so a
+# network, auth or rate-limit error aborts instead of allowing an overwrite.
+if ! existing_tags=$(registry_phy_tags); then
+    echo "Error: could not list tags of $FULL_IMAGE"
+    exit 1
+fi
+if grep -qx "$TAG" <<<"$existing_tags"; then
     echo "Error: Tag $TAG already exists for $FULL_IMAGE"
     exit 1
 fi
@@ -84,17 +133,11 @@ echo "Updating latest tag to point to $TAG"
 
 # Tag locally
 podman tag "$IMAGE_NAME:$TAG" "$FULL_IMAGE:latest"
-    
+
 # Push latest tag
 podman push --creds "$NAMESPACE":"$PASSWORD" "$FULL_IMAGE:latest"
 
 # Create git tag
-GIT_TAG="${IMAGE_NAME}_${TAG}"
-if git rev-parse "$GIT_TAG" >/dev/null 2>&1; then
-    echo "Error: Git tag $GIT_TAG already exists"
-    exit 1
-fi
-
 echo "Creating git tag: $GIT_TAG"
 git tag "$GIT_TAG"
-git push origin "$GIT_TAG"
+git push "$REMOTE" "$GIT_TAG"
