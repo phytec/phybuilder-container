@@ -5,38 +5,38 @@ RUN \
 	apt-get clean && \
 	apt-get update && \
 	DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends \
-	bash-completion \
-	build-essential \
-	chrpath \
-	cpio \
-	diffstat \
-	file \
-	g++-multilib \
-	gawk \
-	gcc-multilib \
-	git-core \
-	less \
-	libncurses-dev \
-	locales \
-	lz4 \
-	procps \
-	openssh-client \
-	pipx \
-	python3 \
-	python3-distutils \
-	python3-pip \
-	python-is-python3 \
-	rsync \
-	socat \
-	sudo \
-	sysstat \
-	texinfo \
-	tmux \
-	unzip \
-	vim \
-	wget \
-	xz-utils \
-	zstd \
+		bash-completion \
+		build-essential \
+		chrpath \
+		cpio \
+		diffstat \
+		file \
+		g++-multilib \
+		gawk \
+		gcc-multilib \
+		git-core \
+		less \
+		libncurses-dev \
+		locales \
+		lz4 \
+		procps \
+		openssh-client \
+		pipx \
+		python3 \
+		python3-distutils \
+		python3-pip \
+		python-is-python3 \
+		rsync \
+		socat \
+		sudo \
+		sysstat \
+		texinfo \
+		tmux \
+		unzip \
+		vim \
+		wget \
+		xz-utils \
+		zstd \
 	&& rm -rf /var/lib/apt/lists/* && \
 	echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen && \
 	locale-gen
